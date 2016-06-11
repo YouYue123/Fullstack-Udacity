@@ -1,3 +1,14 @@
 # Fullstack-Udacity
 
-project1 -- Project: Movie Trailer Website
+## Requirements
+- python 2.7.10
+
+
+## project1 : Movie Trailer Website
+
+### Setup
+Download the folder project1, then using commande line to direct to this directory.
+Then runing the following command, the page will open automaticly
+```bash
+$ python entertainment_center.py
+```
