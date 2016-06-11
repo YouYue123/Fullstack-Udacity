@@ -1,7 +1,7 @@
 import media
 import fresh_tomatoes
 
-
+# Instantiate movies
 warcraft = media.Movie("Warcraft: The Beginning","A story for wower to memorize their honorable past",
 					   "http://cdn1-www.comingsoon.net/assets/uploads/gallery/warcraft-1387407720/warcraft_ver8_xlg.jpg","https://www.youtube.com/watch?v=2Rxoz13Bthc")
 
@@ -21,7 +21,7 @@ whisper_of_the_heart = media.Movie("Whisper of the Heart","A story about a coupl
 memories_of_matsuko = media.Movie("Memories of Matsuko","A tragedy is always from a human's heart itself",
 								  "http://iv1.lisimg.com/image/58547/421full-memories-of-matsuko-poster.jpg","https://www.youtube.com/watch?v=h5YiO1kSZdQ")
 
-
+# Compile movie instances into a list
 movies = [warcraft,spirited_away,castle_in_sky,totoro,whisper_of_the_heart,memories_of_matsuko]
-
+# Dynamically generate html via external fresh_tomatoes module
 fresh_tomatoes.open_movies_page(movies)
