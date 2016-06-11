@@ -4,7 +4,7 @@
 - python 2.7.10
 
 
-## project1 : Movie Trailer Website
+## Project1 : Movie Trailer Website
 
 ### Setup
 Download the folder project1, then using commande line to direct to this directory.
