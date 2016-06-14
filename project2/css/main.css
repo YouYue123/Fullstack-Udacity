@@ -1,0 +1,31 @@
+
+body {
+  font-family: 'Lato', sans-serif;
+  color : #2d3c49;
+  font-weight: 500;
+}
+
+hr{
+   height: 5px;
+   background: #7d97ad;
+}
+
+
+/*
+ *
+ * Common
+ *
+ */
+
+.text-muted{
+  color : #7d97ad;
+}
+
+.text-thin{
+  font-weight: 100;
+}
+
+
+.title-logo{
+  margin-top: 20px; 
+}
