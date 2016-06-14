@@ -12,3 +12,8 @@ Then runing the following command, the page will open automaticly
 ```bash
 $ python entertainment_center.py
 ```
+## Project2 : Build a Portfolio Site
+
+### Setup
+Download the folder project2, just render index.html in browser.
+
