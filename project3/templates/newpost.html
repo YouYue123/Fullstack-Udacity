@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content%}
+  <div class="row">
+      <div class="center-block">
+	     <h2>New Post</h2>
+      </div>
+  </div>
+  <div class="row">
+    <form method="post">
+    
+      <div class="row">
+        <div class="center-block">
+          <div>subject</div>
+          <input type="text" name="subject" value="{{subject}}">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="center-block">
+          <div>blog</div>
+          <textarea name="content">{{content}}</textarea>
+        </div>
+      </div>
+
+      <div class="row error">{{error}}</div>
+      
+      <div class="row">
+        <div class="center-block">
+          <button type="submit" class="btn btn-lg btn-success">Submit</button>
+        </div>
+      </div>
+    </form>
+
+  </div>
+
+{% endblock %}

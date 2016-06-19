@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+	<head>
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width,initial-scale=1">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<link rel="stylesheet" href="/static/main.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+		<script   src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+		<title>Amazing Blog</title>
+	</head>
+
+	<body>
+
+		<main class="container">
+
+			<div class="row">
+				{% if username %}
+				<div class="btn-group pull-right">
+  					<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    				{{username}} <span class="caret"></span>
+  					</button>
+  					<ul class="dropdown-menu">
+    					<li><a href="/logout">Logout</a></li>
+    					<li><a href="/blog/newpost">Post new blog</a></li>
+  					</ul>
+				</div>
+				{% else %}
+				<div class="btn-group pull-right">
+  					<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    				More <span class="caret"></span>
+  					</button>
+  					<ul class="dropdown-menu">
+    					<li><a href="/login">Login</a></li>
+    					<li><a href="/register">Register</a></li>
+  					</ul>
+				</div>
+				{% endif %}
+			</div>
+
+			<div class="row">
+				<div class="col-md-12 main-title">
+					<a href="/blog">Amazing Blog</a>
+				</div>
+			</div>
+
+
+			<div class="row">
+				{% block content%}
+				{% endblock %}
+			</div>
+
+		</main>
+
+	</body>
+
+</html>

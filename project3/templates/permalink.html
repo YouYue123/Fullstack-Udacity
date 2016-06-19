@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+ 
+  {{ post.render(username) | safe}}
+
+  <div  class="col-md-12 comment-area">
+
+		{% for comment in comments %}
+			{{ comment.render() | safe }}
+			<br><br>
+		{% endfor %}
+  </div>
+
+{% endblock %}

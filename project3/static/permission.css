@@ -1,0 +1,20 @@
+.container{
+	margin-top: 10%;
+}
+
+.center-block{
+	width:25%;
+	min-width:200px;
+}
+
+.element{
+	margin-top: 1%;
+}
+
+.btn-info{
+	float:right;
+}
+
+.error{
+	color: red;
+}

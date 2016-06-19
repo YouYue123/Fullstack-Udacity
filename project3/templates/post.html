@@ -1,0 +1,86 @@
+<div class="post">
+	<div class="post-heading">
+		
+		<div class="row" >
+				<div class="post-title text-center">
+					<h2>{{post.subject}}</h2>
+				</div>
+			</div>
+
+		<div class="row post-info">
+			<div class="post-author">
+					<span class="glyphicon glyphicon-user" aria-hidden="true"></span> : {{author_name}}
+			</div>
+
+			<div class="post-date">
+				<span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> : {{post.created.strftime("%b %d, %Y")}}
+			</div>
+		
+		</div>
+		
+		<div class="function-btn-group">
+			
+
+			{% if username %}
+			<button class="btn btn-primary"  data-toggle="modal" data-target="#myModal"> 
+				<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 
+				Comment 
+			</button>
+			{% endif %}
+
+			{% if username and username == author_name %}
+			<a href="/blog/edit?post_id={{post.key().id()}}" class="btn btn-success"> 
+				<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> 
+				Edit 
+			</a>
+
+			<a href="/blog/delete?post_id={{post.key().id()}}" class="btn btn-danger"> 
+				<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> 
+				Delete 
+			</a>
+		
+			{% endif %}
+
+			{%if username and username != author_name%}
+			<a href="/blog/like?post_id={{post.key().id()}}" class="btn btn-info {{like_status}}"> 
+				<span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> 
+				Like {{post.like}}
+			</a>
+			{% endif %}
+
+		</div>
+		
+		<div class="clear"></div>
+
+	</div>
+
+	<div class="text-center post-content">
+		{{post._render_text | safe}}
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <form action="/blog/comment?post_id={{post.key().id()}}" method="post">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title" id="myModalLabel">Comment</h4>
+		      </div>
+		      <div class="modal-body">
+	          		<div class="form-group">
+	            		<label for="message-text" class="control-label">Message:</label>
+	            		<textarea class="form-control" name="commment-content" rows="10"></textarea>
+	          		</div>
+		      </div>
+
+		      <div class="modal-footer">
+		        <a type="button" class="btn btn-danger" data-dismiss="modal">Close</a>
+		        <button type="submit" class="btn btn-success">Submit</button>
+		      </div>
+	      </form>
+	    </div>
+	  </div>
+	</div>
+	
+</div>

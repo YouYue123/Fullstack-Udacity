@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+
+{% block content%}
+  <div class="row">
+      <div class="center-block">
+	     <h3 style="float:left;">Edit</h3>
+	     <h3 style="float:right;">Last Modified :{{post.last_modified.strftime("%b %d, %Y")}}</h3>
+      </div>
+  </div>
+  <div class="row">
+    <form action="/blog/{{post.key().id()}}" method="post">
+
+      <div class="row">
+        <div class="center-block">
+          <h2>subject</h2>
+          <input type="text" name="subject" value="{{post.subject}}">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="center-block">
+          <h4>blog</h4>
+          <textarea name="content">{{post.content}}</textarea>
+        </div>
+      </div>
+
+      <div class="row error">{{error}}</div>
+      
+      <div class="row">
+        <div class="center-block">
+          <button type="submit" class="btn btn-lg btn-success">Save</button>
+          <a href="/blog/{{post.key().id()}}" class="btn btn-lg btn-danger">Cancel</a>
+        </div>
+      </div>
+    </form>
+
+  </div>
+
+{% endblock %}

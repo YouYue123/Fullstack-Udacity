@@ -1,0 +1,16 @@
+<div class="row comment">
+
+	<div class="col-md-12">
+		<div class="row">
+			<span class="glyphicon glyphicon-user comment-element" aria-hidden="true"></span>
+			<h4 class="comment-element">{{author_name}}</h4>
+			<span class="glyphicon glyphicon-time comment-element" aria-hidden="true"></span>
+			<h5 class="comment-element">{{comment.create_time.strftime("%b %d, %Y")}}</h5>
+		</div>
+		<div class="row">
+			<p>{{comment.content}}</p>
+		</div>
+	</div>
+
+</div>
+

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+      <link rel="stylesheet" href="/static/permission.css">
+      <script href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+      <title>Register</title>
+
+  </head>
+
+  <body>
+    <div class="container">
+      
+      <div class="row text-center">
+          <h2>Register</h2>
+      </div>
+
+      <div class="row">
+          <form method="post">
+              
+              <div class="row element">
+                  <div class="center-block">
+                    <div class="input-group"> 
+                      <span class="input-group-addon">Username</span>
+                      <input type="text" class="form-control" name="username" value="{{username}}">
+                    </div>
+                    <div class="error text-center">
+                      {{error_username}}
+                    </div>
+                  </div>
+              </div>
+
+               <div class="row element">
+                  <div class="center-block">
+                    <div class="input-group"> 
+                      <span class="input-group-addon">Password</span>
+                      <input type="password" class="form-control" name="password" value="{{username}}">
+                    </div>
+                    <div class="error text-center">
+                        {{error_password}}
+                    </div>
+                  </div>
+              </div>
+          
+              <div class="row element">
+                  <div class="center-block">
+                    <div class="input-group"> 
+                      <span class="input-group-addon">Verify Password</span>
+                      <input type="password" class="form-control" name="verify" value="{{username}}">
+                    </div>
+                    <div class="error text-center">
+                        {{error_verify}}
+                    </div>
+                  </div>
+              </div>
+
+              <div class="row element">
+                  <div class="center-block">
+                    <div class="input-group"> 
+                      <span class="input-group-addon">Email(optional)</span>
+                      <input type="text" class="form-control" name="email" value="{{email}}">
+                    </div>
+                    <div class="error text-center">
+                        {{error_email}}
+                    </div>
+                  </div>
+              </div>
+
+              <div class="row element">
+                  <div class="center-block">
+                    <a href="/login"  class="btn btn-lg btn-success">Return to Login</a>
+                    <button type="submit" class="btn btn-lg btn-info">Register</button>
+                  </div>
+              </div>
+
+      </form>
+      </div>
+
+      </div>
+  </body>
+
+</html>
