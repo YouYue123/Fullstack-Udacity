@@ -1,24 +1,15 @@
-import os
 import re
-import time
-import random
-import hashlib
-import hmac
 import datetime
-from string import letters
+import hmac
 import webapp2
-import jinja2
-from google.appengine.ext import db
-
-template_dir = os.path.join(os.path.dirname(__file__), 'templates')
-jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
-                               autoescape = True)
+# import self implemented modules
+from user import User
+from post import Post
+from comment import Comment
+from like_post_relation import LikePostRelation
+from global_func import render_str
 
 secret = 'YouYue'
-
-def render_str(template, **params):
-    t = jinja_env.get_template(template)
-    return t.render(params)
 
 def make_secure_val(val):
     return '%s|%s' % (val, hmac.new(secret, val).hexdigest())
@@ -63,121 +54,6 @@ class BlogHandler(webapp2.RequestHandler):
 def render_post(response, post):
     response.out.write('<b>' + post.subject + '</b><br>')
     response.out.write(post.content)
-
-##### user stuff
-def make_salt(length = 5):
-    return ''.join(random.choice(letters) for x in xrange(length))
-
-def make_pw_hash(name, pw, salt = None):
-    if not salt:
-        salt = make_salt()
-    h = hashlib.sha256(name + pw + salt).hexdigest()
-    return '%s,%s' % (salt, h)
-
-def valid_pw(name, password, h):
-    salt = h.split(',')[0]
-    return h == make_pw_hash(name, password, salt)
-
-def users_key(group = 'default'):
-    return db.Key.from_path('users', group)
- 
-class User(db.Model):
-    name = db.StringProperty(required = True)
-    pw_hash = db.StringProperty(required = True)
-    email = db.StringProperty()
-
-    @classmethod
-    def by_id(cls, uid):
-        return User.get_by_id(uid, parent = users_key())
-
-    @classmethod
-    def by_name(cls, name):
-        return User.all().filter('name =', name).get()
-
-
-    @classmethod
-    def register(cls, name, pw, email = None):
-        pw_hash = make_pw_hash(name, pw)
-        return User(parent = users_key(),
-                    name = name,
-                    pw_hash = pw_hash,
-                    email = email)
-
-    @classmethod
-    def login(cls, name, pw):
-        u = cls.by_name(name)
-        if u and valid_pw(name, pw, u.pw_hash):
-            return u
-
-
-##### blog stuff
-
-def blog_key(name = 'default'):
-    return db.Key.from_path('blogs', name)
-## Post Model
-class Post(db.Model):
-    subject = db.StringProperty(required = True)
-    content = db.TextProperty(required = True)
-    created = db.DateTimeProperty(auto_now_add = True)
-    created_by = db.IntegerProperty(required = True)
-    like = db.IntegerProperty(required=True)
-    last_modified = db.DateTimeProperty(auto_now = True)
-
-    @classmethod
-    def by_id(cls,post_id):
-        return Post.get_by_id(post_id,parent=blog_key())
-
-    def render(self,username):
-        self._render_text = self.content.replace('\n', '<br>')
-        user = User.by_id(int(self.created_by))
-        author_name =  user.name
-        like_status = ""
-        if LikePostRelation.check_like_status(user.key().id(),self.key().id()):
-            like_status = "disabled"
-
-        return render_str("post.html", post = self,author_name=author_name,username = username,like_status=like_status)
-
-
-    def render_preview(self):
-        user = User.by_id(int(self.created_by))
-        author_name =  user.name
-        return render_str("post-preview.html", post = self,author_name= author_name)
-
-#### comment stuff
-def comment_key(name='default'):
-    return db.Key.from_path('comments',name)
-## Comment Model
-class Comment(db.Model):
-    created_by = db.IntegerProperty(required=True)
-    create_time = db.DateTimeProperty(auto_now_add=True)
-    content = db.StringProperty(required=True)
-    post_id = db.IntegerProperty(required=True)
-    
-    def render(self):
-        author_name = User.by_id(int(self.created_by)).name
-        return render_str("comment.html",comment=self,author_name = author_name)
-
-    @classmethod
-    def comments_by_post_id(cls,post_id):
-        post_id = int(post_id)
-        return Comment.all().filter('post_id =',post_id).order('-create_time')
-
-#### like_post_relation stuff
-def like_post_relation_key(name='default'):
-    return db.Key.from_path('likes',name)
-
-## LikePostRelation Model
-class LikePostRelation(db.Model):
-    like_by = db.IntegerProperty(required=True)
-    post_id = db.IntegerProperty(required=True)
-
-    @classmethod
-    def check_like_status(cls,user_id,post_id):
-        user_id = int(user_id)
-        post_id = int(post_id)
-        q = db.GqlQuery("SELECT * FROM LikePostRelation WHERE like_by = :user_id and post_id = :post_id",user_id = user_id,post_id = post_id)
-       
-        return q.get()
             
 
 ## Blog Front Page Handler
@@ -193,14 +69,13 @@ class BlogFront(BlogHandler):
 ## Post Page Handler
 class PostPage(BlogHandler):
     def get(self, post_id):
-        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
-        post = db.get(key)
+        post = Post.by_id(post_id)
         comments = Comment.comments_by_post_id(post.key().id())
         if not post:
             self.redirect('/blog')
             return
         if self.user:
-            self.render("permalink.html", post = post, username = self.user.name,comments=comments)
+            self.render("permalink.html", post = post, username = self.user.name,comments=comments,user_id=self.user.key().id())
         else:
             self.render("permalink.html", post = post,comments=comments)
     
@@ -213,12 +88,9 @@ class PostPage(BlogHandler):
         content = self.request.get('content')
         user_id = self.user.key().id()
         last_modified = datetime.datetime.now()
-        post = Post.by_id(int(post_id))
+        post = Post.by_id(post_id)
         if post and post.created_by == user_id:
-           post.subject = subject
-           post.content = content
-           post.last_modified = last_modified
-           post.put()
+           Post.update(post_id,subject,content,last_modified)
         self.redirect('/blog/%s' % post_id)
     
 ## New Post Handler
@@ -240,8 +112,7 @@ class NewPost(BlogHandler):
         user_id = int(self.read_secure_cookie('user_id'))
 
         if subject and content:
-            p = Post(parent = blog_key(), subject = subject, content = content,created_by = user_id,like=0)
-            p.put()
+            p = Post.create(subject,content,user_id)
             self.redirect('/blog/%s' % str(p.key().id()))
         else:
             error = "subject and content, please!"
@@ -343,7 +214,7 @@ class EditPost(BlogHandler):
     def get(self):
         post_id = self.request.get('post_id')
         if post_id:
-            post = Post.by_id(int(post_id))
+            post = Post.by_id(post_id)
             if self.user.key().id() == post.created_by:
                 self.render("edit.html",username=self.user.name,post=post)
             else:
@@ -355,12 +226,14 @@ class EditPost(BlogHandler):
 class DeletePost(BlogHandler):
     def get(self):
         post_id = self.request.get('post_id')
+        
         if not self.user or not post_id:
             self.redirect('/blog/%s' % post_id)
-        post = Post.by_id(int(post_id))
+        post = Post.by_id(post_id)
+        
         if post and post.created_by == self.user.key().id():
-            db.delete(post)
-            db.delete(post)
+            Post.delete(post_id)
+
         self.redirect('/blog')
 
 ## Like Post Handler
@@ -370,11 +243,8 @@ class LikePost(BlogHandler):
         user_id = self.user.key().id()
 
         if user_id and post_id and not LikePostRelation.check_like_status(user_id,post_id):
-            post = Post.by_id(int(post_id))
-            post.like += 1
-            post.put()
-
-            like_post_relation = LikePostRelation(parent=like_post_relation_key(),like_by=int(user_id),post_id=int(post_id))
+            Post.updateLike(post_id)
+            like_post_relation = LikePostRelation.create_like_post_relation(user_id,post_id)
             like_post_relation.put()
 
         self.redirect('/blog/%s' % post_id)
@@ -388,14 +258,36 @@ class CommentPost(BlogHandler):
         content = self.request.get('commment-content')
         created_by = self.user.key().id()
         create_time = datetime.datetime.now()
-        comment = Comment(parent=comment_key(),created_by=created_by,create_time=create_time,
-                          content=content,post_id=int(post_id))
-        comment.put()
-        comment.put()
-
+        Comment.create(created_by=created_by,create_time=create_time,
+                       content=content,post_id=post_id)
         self.redirect('/blog/%s' % post_id);
 
 
+class CommentUpdate(BlogHandler):
+    def post(self):
+        if not self.user:
+            self.redirect('/blog')
+        comment_id = self.request.get('comment_id')
+        content = self.request.get('comment-content')
+        comment = Comment.by_id(comment_id)
+        if comment.created_by == self.user.key().id():
+            Comment.update(comment_id,content)
+            self.redirect('/blog/%s' % comment.post_id)
+        else:
+            self.redirect('/blog')
+
+class CommentDelete(BlogHandler):
+    def get(self):
+        if not self.user:
+            self.redirect('/blog')
+        comment_id = self.request.get('comment_id')
+        comment = Comment.by_id(comment_id)
+        if comment.created_by == self.user.key().id():
+            post_id = comment.post_id
+            Comment.delete(comment_id)
+            self.redirect('/blog/%s' % post_id)
+        else:
+            self.redirect('/blog')
 ## Router Configuration
 app = webapp2.WSGIApplication([
                                ('/',Welcome),
@@ -407,6 +299,8 @@ app = webapp2.WSGIApplication([
                                ('/blog/like',LikePost),
                                ('/register', Register),
                                ('/blog/comment',CommentPost),
+                               ('/blog/comment/delete',CommentDelete),
+                               ('/blog/comment/update',CommentUpdate),
                                ('/login', Login),
                                ('/logout', Logout)
                                ],

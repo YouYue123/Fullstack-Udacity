@@ -6,9 +6,37 @@
 			<h4 class="comment-element">{{author_name}}</h4>
 			<span class="glyphicon glyphicon-time comment-element" aria-hidden="true"></span>
 			<h5 class="comment-element">{{comment.create_time.strftime("%b %d, %Y")}}</h5>
+			{% if is_author %}
+			<a class="btn btn-success" style="float:right;margin-right: 1%;" data-toggle="modal" data-target="#{{comment.key().id()}}">Edit</a>
+			<a href="/blog/comment/delete?comment_id={{comment.key().id()}}"class="btn btn-danger" style="float:right;margin-right:1%;">Delete</a>
+		    {% endif %}
 		</div>
 		<div class="row">
 			<p>{{comment.content}}</p>
+		</div>
+		<!-- Modal -->
+		<div class="modal fade" id="{{comment.key().id()}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	  		<div class="modal-dialog" role="document">
+		    	<div class="modal-content">
+			      	<form action="/blog/comment/update?comment_id={{comment.key().id()}}" method="post">
+				   	 	<div class="modal-header">
+				     	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				        <h4 class="modal-title" id="myModalLabel">Comment Update</h4>
+				      	</div>
+				      	<div class="modal-body">
+			          		<div class="form-group">
+			            		<label for="message-text" class="control-label">Message:</label>
+			            		<textarea class="form-control" name="comment-content" rows="10">{{comment.content}}</textarea>
+			          		</div>
+				      	</div>
+
+				      	<div class="modal-footer">
+				        	<a type="button" class="btn btn-danger" data-dismiss="modal">Close</a>
+				        	<button type="submit" class="btn btn-success">Submit</button>
+				      	</div>
+			      	</form>
+		    	</div>
+	  		</div>
 		</div>
 	</div>
 

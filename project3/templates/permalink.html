@@ -7,9 +7,8 @@
   <div  class="col-md-12 comment-area">
 
 		{% for comment in comments %}
-			{{ comment.render() | safe }}
+			{{ comment.render(user_id) | safe }}
 			<br><br>
 		{% endfor %}
   </div>
-
 {% endblock %}
