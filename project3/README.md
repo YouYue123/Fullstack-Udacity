@@ -2,11 +2,14 @@
 
 ## Requirements
 - python 2.7.10
-### Setup
+- Google App Engine SDK : https://cloud.google.com/appengine/downloads
 
+### Setup
+```
 Download folder "project3". User Googgle App Engine to lauch it.
 
 The public accessible link is: https://youyue-g.appspot.com/blog
+```
 
 ### Feature
 ```
