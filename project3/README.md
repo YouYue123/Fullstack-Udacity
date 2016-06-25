@@ -1,24 +1,7 @@
-# Fullstack-Udacity
+# Fullstack-Udacity:Multi User Blog
 
 ## Requirements
 - python 2.7.10
-
-
-## Project1 : Movie Trailer Website
-
-### Setup
-Download folder "project1", then using commande line to direct to this directory.
-Then runing the following command, the page will open automaticly
-```bash
-$ python entertainment_center.py
-```
-## Project2 : Build a Portfolio Site
-
-### Setup
-Download folder "project2", just render index.html in browser.
-
-## Project3 : Multi User Blog
-
 ### Setup
 
 Download folder "project3". User Googgle App Engine to lauch it.
