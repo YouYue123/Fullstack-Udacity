@@ -1,4 +1,4 @@
-# Fullstack-Udacity: Project1
+# Fullstack-Udacity: Movie Trailer Website
 
 ## Requirements
 - python 2.7.10
