@@ -1,46 +1,56 @@
 #!/usr/bin/env python
-# 
+#
 # tournament.py -- implementation of a Swiss-system tournament
 #
 
 import psycopg2
 
-def connect():
-    """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=tournament")
+class DB:
+    def __init__(self,db_con_str="dbname=tournament"):
+        """
+        Create a database connection
+        :param str db_con_str: dataname
+        """
+        self.conn = psycopg2.connect(db_con_str)
+    
+    def cursor(self):
+        """
+        Return the current cursor of database
+        """
+        return self.conn.cursor()
+
+    def execute(self,self_query_string,and_close=False):
+        """
+        Execute sql command
+        :param str self_query_string: sql command
+        :param bool and_close: if true,close database after executing and commiting
+        """
+        cursor = self.cursor()
+        cursor.execute(self_query_string)
+        if and_close:
+            self.conn.commit()
+            self.conn.close()
+        return {"conn": self.conn, "cursor": cursor if not and_close else None}
 
 def deleteMatches():
     """Remove all the match records from the database."""
-    db = connect()
-    cursor = db.cursor()
-    cmd = "UPDATE players SET wins=0,matches = 0"
-    sql = "DELETE FROM matches"
-    cursor.execute(cmd)
-    cursor.execute(sql)
-    db.commit()
-    db.close()
+    cmd = "DELETE FROM matches"
+    DB().execute(cmd,True)
     return
 
 def deletePlayers():
     """Remove all the player records from the database."""
-    db = connect()
-    cursor = db.cursor()
-    sql = "DELETE FROM players"
-    cursor.execute(sql)
-    db.commit()
-    db.close()
+    cmd = "DELETE FROM players"
+    DB().execute(cmd,True)
     return
 
 def countPlayers():
     """Returns the number of players currently registered."""
-    db = connect()
-    cursor = db.cursor()
-    sql = "SELECT count(*) as count FROM players"
-    cursor.execute(sql)
-    results = cursor.fetchall()
-    db.close()
-    count = results[0][0]
-    return count
+    cmd = "SELECT count(*) FROM players"
+    conn = DB().execute(cmd,False)
+    cursor = conn["cursor"].fetchone()
+    conn['conn'].close()
+    return cursor[0] 
 
 def registerPlayer(name):
     """Adds a player to the tournament database.
@@ -51,7 +61,7 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
-    db = connect()
+    db = DB().conn
     cursor = db.cursor()
     cmd = "INSERT INTO players(name) values(%s)"
     cursor.execute(cmd,(name,))
@@ -73,12 +83,10 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
-    db = connect()
-    cursor = db.cursor()
-    cmd = "SELECT * FROM players order by wins"
-    cursor.execute(cmd)
-    results = cursor.fetchall()
-    db.close()
+    cmd = "SELECT * FROM v_matches order by wins"
+    conn = DB().execute(cmd,False)
+    results = conn["cursor"].fetchall()
+    conn['conn'].close()
     return results
 
 def reportMatch(winner, loser):
@@ -88,14 +96,10 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
-    db = connect()
+    db = DB().conn
     cursor = db.cursor()
-    cmd = "UPDATE players SET wins=wins+1,matches=matches+1 WHERE id = %s"
-    cmd1 = "UPDATE players SET matches=matches+1 WHERE id = %s"
-    cmd2 = "INSERT INTO matches(winner_id,loser_id) values(%s,%s)"
-    cursor.execute(cmd,(winner,))
-    cursor.execute(cmd1,(loser,))
-    cursor.execute(cmd2,(winner,loser,))
+    cmd = "INSERT INTO matches(winner_id,loser_id) values(%s,%s)"
+    cursor.execute(cmd,(winner,loser,))
     db.commit()
     db.close()
     return
@@ -157,7 +161,7 @@ def checkRematch(player1,player2):
     Returns:
         the rematch status of these two players
     """
-    db = connect()
+    db = DB().conn
     cursor = db.cursor()
     cmd = "SELECT winner_id, loser_id FROM matches WHERE ((winner_id = %s AND loser_id = %s) OR (winner_id=%s AND loser_id = %s))"
     cursor.execute(cmd,(player1,player2,player2,player1,))
