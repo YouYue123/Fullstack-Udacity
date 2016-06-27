@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+
+	<head>
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width,initial-scale=1">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+		<script   src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+		<script src="https://apis.google.com/js/platform.js" async defer></script>
+		<meta name="google-signin-client_id" content="1034298223889-mpqu8acokll8j9foa79qnh1jmbidum2e.apps.googleusercontent.com">
+		<title>Football Club Catalog</title>
+	</head>
+
+	<body>
+
+		<nav class="navbar navbar-default navbar-static-top">
+  			<div class="container" style="width:80%;">
+      				<h3 class="navbar-text">Football Club Catalog</h3>
+      				<button type="button" class="btn btn-success navbar-btn navbar-right"  data-toggle="modal" data-target="#myModal" style="margin-right: 10%; margin">Login</button>
+  			</div>
+		</nav>
+
+		<main class="container">
+				{% block content%}
+				{% endblock %}
+		</main>
+
+		<!-- Modal -->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title" id="myModalLabel">Login Form</h4>
+		      </div>
+		      <div class="modal-body">
+		      		
+		        	<div class="g-signin2" data-onsuccess="onSignIn"></div>
+		      		
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+	</body>
+	<script>
+		function onSignIn(googleUser) {
+  			var profile = googleUser.getBasicProfile();
+  			console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+  			console.log('Name: ' + profile.getName());
+  			console.log('Image URL: ' + profile.getImageUrl());
+  			console.log('Email: ' + profile.getEmail());
+  			$.ajax({
+  				type:'POST',
+  				url:'/gconnect?state={{state}}',
+  				processData: false,
+  				contentType: 'application/octet-stream;charset=utf-8',
+  				data: profile,
+  				success: function(result){
+  					if(result){
+  						console.log("SignedIn!");
+  					}
+  				}
+  			});
+		}
+	</script>
+</html>
