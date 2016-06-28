@@ -11,27 +11,18 @@ from sqlalchemy import create_engine
 Base = declarative_base()
 
 
-class User(Base):
-	__tablename__ = 'users'
-	id = Column(Integer,primary_key = True)
-	name = Column(String(250),nullable = False)
-	email = Column(String(250))
-	password = Column(String(250),nullable=False)
-
-
-class Catalog(Base):
-	__tablename__ = 'catalogs'
+class Country(Base):
+	__tablename__ = 'countries'
 	id = Column(Integer,primary_key= True)
 	name = Column(String(250),nullable=False)
 
 
-class Item(Base):
-	__tablename__ = 'items'
+class FootballClub(Base):
+	__tablename__ = 'footballclubs'
 	id = Column(Integer,primary_key=True)
 	name = Column(String(250),nullable=False)
-	content = Column(String(250),nullable=False)
-	catalog = relationship(Catalog)
-	owner = relationship(User)
+	country = relationship(Country)
+	add_owner = Column(String(250),nullable = False)
 
 engine = create_engine('sqlite:///catalog.db')
 
