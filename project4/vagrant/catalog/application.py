@@ -1,21 +1,16 @@
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
+from flask import Flask, render_template, request, redirect, jsonify, url_for, flash,make_response
 from flask import session as login_session
-
+#setup environment
 app = Flask(__name__,static_url_path="",static_folder="static")
 app.secret_key = 'somesomelongstring'
-
+#For DB
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base,User,Catalog,Item
-import random,string
-
+from database_setup import Base,Country,FootballClub
+#Python Library
+import random,string,json,requests,httplib2
 ##For oAuth2
-from oauth2client.client import flow_from_clientsecrets
-from oauth2client.client import FlowExchangeError
-import httplib2
-import json
-import flask import make_response
-import requests
+from oauth2client.client import flow_from_clientsecrets,FlowExchangeError
 
 CLIENT_ID = json.loads(open('client_secrets.json','r').read())['web']['client_id'] 
 
@@ -34,7 +29,7 @@ entity.property
 
 def make_json_response(content,status_code):
     response = make_response(json.dumps(content,status_code))
-    response.header['Content-Type'] = 'application/json'
+    response.headers['Content-Type'] = 'application/json'
     return response
 
 
@@ -45,11 +40,6 @@ def index():
     
 	login_session['state'] = state
 	return render_template('main.html',state = state)
-
-@app.route('/logout')
-def logout():
-	login_session.pop('user_id',None)
-	return redirect(url_for('index'))
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -88,7 +78,7 @@ def gconnect():
     gplus_id = credentials.id_token['sub']
     if result['user_id'] != gplus_id:
 
-        return make_json_response('Token's user ID doesn't match given user ID.',401)
+        return make_json_response("Token's user ID doesn't match given user ID.",401)
 
     # Verify that the access token is valid for this app.
     if result['issued_to'] != CLIENT_ID:
@@ -147,14 +137,16 @@ def countryJSON():
     return jsonfy()
 
 
-
 #View country
 @app.route('/')
 @app.route('/country')
-
+def country():
+	country_list = session.query(Country).all()
+	return render_template('country.html')
 #Create new country
 @app.route('/country/new/')
-
+def newCountry():
+	return render_template('new_country.html')
 #Edit the country
 @app.route('/country/<int:country_id>/edit')
 
@@ -172,7 +164,8 @@ def countryJSON():
 
 #Delete the club in the country
 @app.route('/country/<int:country_id>/football_club/<int:club_id>/delete')
-
+def test():
+	return render_template('test.html')
 
 
 if __name__ == '__main__':

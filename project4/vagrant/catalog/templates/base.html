@@ -17,7 +17,17 @@
 		<nav class="navbar navbar-default navbar-static-top">
   			<div class="container" style="width:80%;">
       				<h3 class="navbar-text">Football Club Catalog</h3>
-      				<div class="g-signin2" data-onsuccess="onSignIn"></div>
+      				 <div id="signInButton" style="margin-top:1%; float:right;">
+          				<span class="g-signin"
+            				data-scope="openid email"
+           	 				data-clientid="1034298223889-mpqu8acokll8j9foa79qnh1jmbidum2e.apps.googleusercontent.com"
+            				data-redirecturi="postmessage"
+            				data-accesstype="offline"
+           					data-cookiepolicy="single_host_origin"
+            				data-callback="signInCallback"
+            				data-approvalprompt="force">
+          				</span>
+        			</div>
   			</div>
 		</nav>
 
@@ -28,24 +38,15 @@
 
 	</body>
 	<script>
-		$('document').ready(function(){
-			$.ajax({
-				type: 'GET',
-				url '/',
-			});
-		});
-		function onSignIn(googleUser) {
-  			var profile = googleUser.getBasicProfile();
-  			// console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-  			// console.log('Name: ' + profile.getName());
-  			// console.log('Image URL: ' + profile.getImageUrl());
-  			// console.log('Email: ' + profile.getEmail());
+		function signInCallback(googleUser) {
+			console.log(googleUser)
+  			// var profile = googleUser.getBasicProfile();
   			$.ajax({
   				type:'POST',
   				url:'/gconnect?state={{state}}',
   				processData: false,
   				contentType: 'application/octet-stream;charset=utf-8',
-  				data: profile,
+  				data: googleUser.code,
   				success: function(result){
   					if(result){
   						console.log("SignedIn!");
