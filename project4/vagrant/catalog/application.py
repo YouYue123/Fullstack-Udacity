@@ -18,15 +18,6 @@ engine = create_engine('sqlite:///catalog.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind = engine)
 
-"""
-newEntry = ClassName(Property = "value",...)
-session.add(newEntry)
-session.commit()
-
-entity = session.query(Classname).all() or .first()
-entity.property
-"""
-
 def make_json_response(content,status_code):
     response = make_response(json.dumps(content,status_code))
     response.headers['Content-Type'] = 'application/json'
@@ -41,6 +32,7 @@ def index():
 	login_session['state'] = state
 	return render_template('main.html',state = state, user = login_session['username'])
 
+#google-plus login
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     
@@ -102,6 +94,7 @@ def gconnect():
     result = {'picture': login_session['picture'], 'username' : login_session['username']}
     return make_json_response(result,200)
 
+#google-plus logout
 @app.route('/gdisconnect')
 def gdisconnect():
     access_token = login_session['access_token']
@@ -139,28 +132,36 @@ def countryJSON():
 @app.route('/country')
 def country():
 	country_list = session.query(Country).all()
-	return render_template('country.html')
+	return render_template('country.html'，country_list = country_list)
 #Create new country
 @app.route('/country/new/')
 def newCountry():
-	return render_template('new_country.html')
+    if request.method = 'GET':
+	   return render_template('new_country.html')
+    if request.method = 'POST':
+
 #Edit the country
-@app.route('/country/<int:country_id>/edit')
+@app.route('/country/<int:country_id>/edit',methods=['POST'])
 
 #Delete the country
-@app.route('/country/<int:country_id>/delete')
+@app.route('/country/<int:country_id>/delete',methods=['POST'])
 
 #View clubs under the country
-@app.route('/country/<int:country_id>/football_club/')
+@app.route('/country/<int:country_id>/football_club/',methods=['GET'])
 
 #Add new club in the country
 @app.route('/country/<int:country_id>/football_club/new')
+def newFootballClub():
+
+    if reqeust.method = 'GET':
+
+    if request.method = 'POST':
 
 #Edit the club in the country
-@app.route('/country/<int:country_id>/football_club/<int:club_id>/edit')
+@app.route('/country/<int:country_id>/football_club/<int:club_id>/edit',methods['POST'])
 
 #Delete the club in the country
-@app.route('/country/<int:country_id>/football_club/<int:club_id>/delete')
+@app.route('/country/<int:country_id>/football_club/<int:club_id>/delete',methods['POST'])
 def test():
 	return render_template('test.html')
 
