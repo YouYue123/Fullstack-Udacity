@@ -39,7 +39,7 @@ def index():
                     for x in xrange(32))
     
 	login_session['state'] = state
-	return render_template('main.html',state = state)
+	return render_template('main.html',state = state, user = login_session['username'])
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -51,7 +51,6 @@ def gconnect():
     
     # Obtain authorization code
     code = request.data
-
     try:
         # Upgrade the authorization code into a credentials object
         oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
@@ -90,20 +89,18 @@ def gconnect():
     if stored_credentials is not None and gplus_id == stored_gplus_id:
 
         return make_json_response("Current user is already connected",200)
-
-    # Store the access token in the session for later use.
-    login_session['credentials'] = credentials
-    login_session['gplus_id'] = gplus_id
-
     # Get user info
     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
     params = {'access_token': credentials.access_token, 'alt': 'json'}
     answer = requests.get(userinfo_url, params=params)
     data = json.loads(answer.text)
+    login_session['access_token'] = credentials.access_token
+    login_session['gplus_id'] = gplus_id
     login_session['username'] = data["name"]
     login_session['picture'] = data["picture"]
     login_session['email'] = data["email"] 
-    return make_json_response("Yes",200)
+    result = {'picture': login_session['picture'], 'username' : login_session['username']}
+    return make_json_response(result,200)
 
 @app.route('/gdisconnect')
 def gdisconnect():
@@ -129,7 +126,7 @@ def gdisconnect():
 #JSON APIs to view 
 @app.route('/country/<int:country_id>/football_club/JSON')
 def countryfootballClubs(country_id):
-
+    
     return jsonfy(football_clubs = FootballClub.serialize)
 
 @app.route('/country/JSON')

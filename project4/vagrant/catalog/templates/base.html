@@ -39,7 +39,7 @@
 	</body>
 	<script>
 		function signInCallback(googleUser) {
-			console.log(googleUser)
+			//console.log(googleUser)
   			// var profile = googleUser.getBasicProfile();
   			$.ajax({
   				type:'POST',
@@ -49,10 +49,30 @@
   				data: googleUser.code,
   				success: function(result){
   					if(result){
-  						console.log("SignedIn!");
+
+  						$('#signInButton').html(
+  							"<img src='" + result.picture +"''></img>" + 
+  							"<p>"+ result.username + "</p>");
   					}
+  				},
+  				error :  function(result){
+
   				}
   			});
+		}
+		function signOutCallback(){
+			$.ajax({
+				type:'POST',
+				url:'/gdisconnect',
+				processData:false,
+				content: 'application/octet-stream;charset=utf-8',
+				success: function(result){
+					alert(result)
+				},
+				error : function(result){
+					alert(result)
+				}
+			});
 		}
 	</script>
 </html>
