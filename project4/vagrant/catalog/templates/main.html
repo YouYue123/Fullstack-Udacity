@@ -2,42 +2,40 @@
 
 {% block content %}
 <div class="row">
-	<div class="col-md-4" style="border-right:2px solid; border-color:black;">
-		<div class="row">
-			<h2>Categories</h2>
+	<div class="col-md-5" style="border-right:2px solid; border-color:black;">
+		<div class="row text-center">
+			<h2>Countries</h2>
 		</div>
-		<div class="row">
-			<a>Title</a>
+		{% for country in countries %}
+		<div class="row text-center" style="margin-top: 1%;">
+			<a class="btn btn-primary show_club_btn" data-id ={{country.id}} data-name={{country.name}} style="width : 100px;">{{country.name | safe}}</a>
+			{% if country.editable == True%}
+			<a data-id= {{country.id}} data-name={{country.name}} class="btn btn-info edit_country_btn" style = "width : 50px;">Edit</a>
+			{% endif %}
 		</div>
-		<div class="row">
-			<a>Title</a>
+		{% endfor%}
+		{% if username %}
+		<div align="center" style="margin-top:1%;">
+			<a class="btn btn-success add_country_btn">+Add More</a>
 		</div>
-		<div class="row">
-			<a>Title</a>
-		</div>
-		<div class="row">
-			<a>Title</a>
-		</div>
+		{% endif %}
 	</div>
-	<div class="col-md-2">
+	<div class="col-md-1">
 	</div>
-	<div class="col-md-5">
-		<div class="row">
+	<div class="col-md-4">
+		<div class="row text-center" id="club_row">
 			<div class="row">
-				<h2>Items</h2>
+				<h2 id="club_list_title">Please Select Country First</h2>
 			</div>
-			<div class="row">
-				<a>Title</a>
+			{% for club in clubs %}
+			<div class="row text-center ">
+				<h4>{{club.name | safe}}</h4>
 			</div>
-			<div class="row">
-				<a>Title</a>
+			{% endfor%}
+			{% if username %}
+			<div id="add_club_sub" class="row text-center">
 			</div>
-			<div class="row">
-				<a>Title</a>
-			</div>
-			<div class="row">
-				<a>Title</a>
-			</div>
+			{% endif %}
 		</div>
 	</div>
 

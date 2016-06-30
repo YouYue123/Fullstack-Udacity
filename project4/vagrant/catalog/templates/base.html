@@ -4,11 +4,11 @@
 	    <meta charset="utf-8">
 	    <meta name="viewport" content="width=device-width,initial-scale=1">
 	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	    <script src="https://apis.google.com/js/platform.js" async defer></script>
+		<meta name="google-signin-client_id" content="1034298223889-mpqu8acokll8j9foa79qnh1jmbidum2e.apps.googleusercontent.com">
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 		<script   src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-		<script src="https://apis.google.com/js/platform.js" async defer></script>
-		<meta name="google-signin-client_id" content="1034298223889-mpqu8acokll8j9foa79qnh1jmbidum2e.apps.googleusercontent.com">
 		<title>Football Club Catalog</title>
 	</head>
 	
@@ -17,30 +17,68 @@
 		<nav class="navbar navbar-default navbar-static-top">
   			<div class="container" style="width:80%;">
       				<h3 class="navbar-text">Football Club Catalog</h3>
-      				 <div id="signInButton" style="margin-top:1%; float:right;">
-          				<span class="g-signin"
-            				data-scope="openid email"
-           	 				data-clientid="1034298223889-mpqu8acokll8j9foa79qnh1jmbidum2e.apps.googleusercontent.com"
-            				data-redirecturi="postmessage"
-            				data-accesstype="offline"
-           					data-cookiepolicy="single_host_origin"
-            				data-callback="signInCallback"
-            				data-approvalprompt="force">
-          				</span>
+      				 {%if not username%}
+      				 <div id="signBtnDiv">
+	      				 <div style="margin-top:1%; float:right;">
+	          				<span class="g-signin"
+	            				data-scope="openid email"
+	           	 				data-clientid="1034298223889-mpqu8acokll8j9foa79qnh1jmbidum2e.apps.googleusercontent.com"
+	            				data-redirecturi="postmessage"
+	            				data-accesstype="offline"
+	           					data-cookiepolicy="single_host_origin"
+	            				data-callback="signInCallback"
+	            				data-approvalprompt="force">
+	          				</span>
+	        			</div>
         			</div>
+        			{%else%}
+        			
+        				<button class='btn btn-danger' onclick='signOutCallback()' style="margin-top:1%;float:right;">Logout</button>
+        				<p style="float:right; margin-top:1.5%;margin-right:1%;">welcome {{username | safe}}</p>
+        	
+        			{%endif%}
   			</div>
 		</nav>
-
+		
 		<main class="container">
 				{% block content%}
 				{% endblock %}
 		</main>
 
+		<!-- Modal -->
+
+		<div class="modal fade" id="present_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	  		<div class="modal-dialog" role="document">
+		    	<div class="modal-content">
+			      	<form id="present_form" method="post">
+              			<div class="modal-header">
+        					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        					<h4 id="modal_main_title" class="modal-title"></h4>
+      					</div>
+      					<div class="modal-body">
+        					<span id="modal_body_title" class="input-group-addon"></span>
+                     	    <input type="textarea" id="name" class="form-control" name="name">
+      					</div>
+      					<div class="modal-footer">
+        					<a type="button" class="btn btn-default" data-dismiss="modal">Close</a>
+        					<button id="save_btn" type="submit" class="btn btn-success">Save</button>
+        					<a id="delete_btn" class="btn btn-danger">Delete</a>
+      					</div>            	
+           			</form>
+		    	</div>
+	  		</div>
+		</div>
+		
+		<div id="club_add_btn" hidden>
+			<div align="center">
+				<a id="addClub" class="btn btn-success">+Add More</a>
+			</div>
+		</div>
+	
 	</body>
+
 	<script>
 		function signInCallback(googleUser) {
-			//console.log(googleUser)
-  			// var profile = googleUser.getBasicProfile();
   			$.ajax({
   				type:'POST',
   				url:'/gconnect?state={{state}}',
@@ -49,10 +87,7 @@
   				data: googleUser.code,
   				success: function(result){
   					if(result){
-
-  						$('#signInButton').html(
-  							"<img src='" + result.picture +"''></img>" + 
-  							"<p>"+ result.username + "</p>");
+  						window.location.href = "/"; 
   					}
   				},
   				error :  function(result){
@@ -60,6 +95,7 @@
   				}
   			});
 		}
+
 		function signOutCallback(){
 			$.ajax({
 				type:'POST',
@@ -67,12 +103,57 @@
 				processData:false,
 				content: 'application/octet-stream;charset=utf-8',
 				success: function(result){
-					alert(result)
-				},
-				error : function(result){
-					alert(result)
+					window.location.href = "/"; 				
 				}
 			});
 		}
+
+		$(document).on("click", ".add_country_btn", function () {
+     			$('#modal_main_title').text('Add a new country')
+     			$('#modal_body_title').text('Country');
+     			$("#present_form").attr("action", "/country/new");
+     			$("#delete_btn").hide()
+     		    $('#present_modal').modal('show');
+		});
+
+		$(document).on("click", ".edit_country_btn", function () {
+     			var country_id = $(this).data('id');
+     			var country_name = $(this).data('name');
+     			$('#modal_main_title').text('Edit Country Information')
+     			$('#modal_body_title').text('Country');
+     			$("#name").val( country_name );
+     			$("#present_form").attr("action", "/country/"+ country_id +"/edit");
+     			$("#delete_btn").attr("onclick","deleteCountry(" + country_id  +")")
+     		    $('#present_modal').modal('show');
+		});
+
+
+		function deleteCountry(country_id){
+			
+			$.ajax({
+				type: 'POST',
+				url: '/country/' + country_id + '/delete',
+				content:'application/octet-stream;charset=utf-8',
+				success: function(result){
+					window.location.href="/";
+				}
+			});
+		
+		}
+
+		$(document).on("click",".show_club_btn",function(){
+				var country_id = $(this).data('id');
+				var country_name = $(this).data('name');
+				$.ajax({
+					type:'GET',
+					url:'/country/'+  country_id +'/football_club/JSON',
+					content:'application/octet-stream;charset=utf-8',
+					success: function(result){
+						
+						$('#club_list_title').text(country_name + " Club List");
+						$('#add_club_sub').html($('#club_add_btn').html())
+					}
+				});
+		});
 	</script>
 </html>

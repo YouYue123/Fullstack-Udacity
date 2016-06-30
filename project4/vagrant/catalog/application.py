@@ -17,6 +17,7 @@ CLIENT_ID = json.loads(open('client_secrets.json','r').read())['web']['client_id
 engine = create_engine('sqlite:///catalog.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind = engine)
+session = DBSession()
 
 def make_json_response(content,status_code):
     response = make_response(json.dumps(content,status_code))
@@ -26,11 +27,34 @@ def make_json_response(content,status_code):
 
 @app.route('/')
 def index():
-	state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+	
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
-    
-	login_session['state'] = state
-	return render_template('main.html',state = state, user = login_session['username'])
+
+    login_session['state'] = state
+
+    username = None
+
+
+    if not 'username' in login_session:
+        username = None
+    else:
+        username = login_session['username']
+
+    countries = session.query(Country).all()
+    country_list = []
+    for country in countries:
+        country_item = {}
+        country_item['id'] = country.id
+        country_item['name'] = country.name
+        if 'gplus_id' in login_session and country.add_owner == login_session['gplus_id']:
+            country_item['editable'] = True
+        else:
+            country_item['editable'] = False
+
+        country_list.append(country_item)
+
+    return render_template('main.html',state=state,username=username,countries = country_list)
 
 #google-plus login
 @app.route('/gconnect', methods=['POST'])
@@ -92,15 +116,16 @@ def gconnect():
     login_session['picture'] = data["picture"]
     login_session['email'] = data["email"] 
     result = {'picture': login_session['picture'], 'username' : login_session['username']}
+    flash("You are logged in ")
     return make_json_response(result,200)
 
 #google-plus logout
-@app.route('/gdisconnect')
+@app.route('/gdisconnect',methods=['POST'])
 def gdisconnect():
     access_token = login_session['access_token']
     if access_token is None:
-
         return make_json_response("Current user is not connected",401)
+
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
     h = httplib2.Http()
     result = h.request(url,'GET')[0]
@@ -109,7 +134,7 @@ def gdisconnect():
         del login_session['gplus_id']
         del login_session['username']
         del login_session['email']
-        del login_session['pciture']
+        del login_session['picture']
         return make_json_response('Successfully connected',200)
     else:
         return make_json_response('Failed to revoke token for given user',400)
@@ -119,49 +144,54 @@ def gdisconnect():
 #JSON APIs to view 
 @app.route('/country/<int:country_id>/football_club/JSON')
 def countryfootballClubs(country_id):
-    
-    return jsonfy(football_clubs = FootballClub.serialize)
+    clubs = session.query(FootballClub).filter_by(country_id = country_id).all()
+    return jsonify(football_clubs = [club.serialize for club in clubs])
 
 @app.route('/country/JSON')
 def countryJSON():
-    return jsonfy()
+    countries =session.query(Country).all()
+    return jsonify(countriy_list = [country.serialize for country in countries])
 
-
-#View country
-@app.route('/')
-@app.route('/country')
-def country():
-	country_list = session.query(Country).all()
-	return render_template('country.html'，country_list = country_list)
 #Create new country
-@app.route('/country/new/')
+@app.route('/country/new',methods=['POST'])
 def newCountry():
-    if request.method = 'GET':
-	   return render_template('new_country.html')
-    if request.method = 'POST':
-
+        country = Country(name=request.form.get('name'),add_owner=login_session['gplus_id'])
+        session.add(country)
+        session.commit()
+        return redirect('/')
 #Edit the country
 @app.route('/country/<int:country_id>/edit',methods=['POST'])
+def editCountry(country_id):
+    country = session.query(Country).filter_by(id = country_id).first()
+    if 'gplus_id' in login_session and login_session['gplus_id'] == country.add_owner:
+        country.name = request.form.get('name')
 
+    session.commit()
+    return redirect('/')
 #Delete the country
 @app.route('/country/<int:country_id>/delete',methods=['POST'])
-
+def deletecountry(country_id):
+    country = session.query(Country).filter_by(id = country_id).first()
+    if 'gplus_id' in login_session and login_session['gplus_id'] == country.add_owner:
+        session.delete(country)
+    session.commit()
+    return make_json_response('Success',200)
 #View clubs under the country
-@app.route('/country/<int:country_id>/football_club/',methods=['GET'])
+#@app.route('/country/<int:country_id>/football_club/')
 
 #Add new club in the country
 @app.route('/country/<int:country_id>/football_club/new')
-def newFootballClub():
+# def newFootballClub():
 
-    if reqeust.method = 'GET':
+#     if reqeust.method = 'GET':
 
-    if request.method = 'POST':
+#     if request.method = 'POST':
 
 #Edit the club in the country
-@app.route('/country/<int:country_id>/football_club/<int:club_id>/edit',methods['POST'])
+@app.route('/country/<int:country_id>/football_club/<int:club_id>/edit')
 
 #Delete the club in the country
-@app.route('/country/<int:country_id>/football_club/<int:club_id>/delete',methods['POST'])
+@app.route('/country/<int:country_id>/football_club/<int:club_id>/delete')
 def test():
 	return render_template('test.html')
 
