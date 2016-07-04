@@ -25,16 +25,16 @@ def make_json_response(content,status_code):
     return response
 
 
+
 @app.route('/')
 def index():
-	
+
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
 
     login_session['state'] = state
 
     username = None
-
 
     if not 'username' in login_session:
         username = None
@@ -51,7 +51,6 @@ def index():
             country_item['editable'] = True
         else:
             country_item['editable'] = False
-
         country_list.append(country_item)
 
     return render_template('main.html',state=state,username=username,countries = country_list)
@@ -172,28 +171,89 @@ def editCountry(country_id):
 @app.route('/country/<int:country_id>/delete',methods=['POST'])
 def deletecountry(country_id):
     country = session.query(Country).filter_by(id = country_id).first()
+    country_club_list = session.query(FootballClub).filter_by(country_id = country.id).all()
     if 'gplus_id' in login_session and login_session['gplus_id'] == country.add_owner:
+        session.delete(country_club_list)
         session.delete(country)
     session.commit()
     return make_json_response('Success',200)
-#View clubs under the country
-#@app.route('/country/<int:country_id>/football_club/')
+
+#Show Football Club under specific country
+@app.route('/country/<int:country_id>/football_club')
+def showFootballClub(country_id):
+
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+                    for x in xrange(32))
+
+    login_session['state'] = state
+
+    username = None
+
+
+    if not 'username' in login_session:
+        username = None
+    else:
+        username = login_session['username']
+
+    countries = session.query(Country).all()
+    country_list = []
+    for country in countries:
+        country_item = {}
+        country_item['id'] = country.id
+        country_item['name'] = country.name
+        if 'gplus_id' in login_session and country.add_owner == login_session['gplus_id']:
+            country_item['editable'] = True
+        else:
+            country_item['editable'] = False
+        country_list.append(country_item)
+
+    clubs = session.query(FootballClub).filter_by(country_id = country_id).all()
+    club_list = []
+    for club in clubs:
+        club_item = {}
+        club_item['id'] = club.id
+        club_item['name'] = club.name
+        club_item['country_id'] = club.country_id
+        club_item['add_owner'] = club.add_owner
+        if 'gplus_id' in login_session and club.add_owner == login_session['gplus_id']:
+            club_item['editable'] = True
+        else:
+            club_item['editable'] = False
+
+        club_list.append(club_item)
+
+    selected_country = session.query(Country).filter_by(id = country_id).first()
+    country_name = selected_country.name
+    country_id = selected_country.id
+
+    return render_template('main.html',state=state,username=username,countries = country_list,country_club_list = club_list,country_name = country_name,country_id = country_id)    
 
 #Add new club in the country
-@app.route('/country/<int:country_id>/football_club/new')
-# def newFootballClub():
-
-#     if reqeust.method = 'GET':
-
-#     if request.method = 'POST':
+@app.route('/country/<int:country_id>/football_club/new',methods=['POST'])
+def newFootballClub(country_id):
+    club = FootballClub(name = request.form.get('name'),country_id = country_id,add_owner = login_session['gplus_id'])
+    session.add(club)
+    session.commit()
+    return redirect('/country/'+ str(country_id) + '/football_club')
 
 #Edit the club in the country
-@app.route('/country/<int:country_id>/football_club/<int:club_id>/edit')
+@app.route('/country/<int:country_id>/football_club/<int:club_id>/edit',methods = ['POST'])
+def editFootballClub(country_id,club_id):
+    club = session.query(FootballClub).filter_by(id = club_id).first()
+    if 'gplus_id' in login_session and login_session['gplus_id'] == club.add_owner:
+    
+        club.name = request.form.get('name')
 
+    session.commit()
+    return redirect('/country/'+ str(country_id) + '/football_club')
 #Delete the club in the country
-@app.route('/country/<int:country_id>/football_club/<int:club_id>/delete')
-def test():
-	return render_template('test.html')
+@app.route('/country/<int:country_id>/football_club/<int:club_id>/delete',methods = ['POST'])
+def deleteFootballClub(country_id,club_id):
+    club = session.query(FootballClub).filter_by(id = club_id).first()
+    if 'gplus_id' in login_session and login_session['gplus_id'] == club.add_owner:
+        session.delete(club)
+    session.commit()
+    return make_json_response('Success',200)
 
 
 if __name__ == '__main__':

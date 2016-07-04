@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+	<div class="col-md-5 country-list">
+		<div class="row text-center">
+			<h2>Countries</h2>
+		</div>
+		{% for country in countries %}
+		<div class="row text-center top-1">
+			<a class="btn btn-primary show_club_btn" data-id ={{country.id}} data-name={{country.name}} style="width : 100px;" href="/country/{{country.id}}/football_club" >{{country.name | safe}}</a>
+			{% if country.editable == True%}
+			<a data-id= {{country.id}} data-name={{country.name}} class="btn btn-info edit_country_btn" style = "width : 50px;">Edit</a>
+			{% endif %}
+		</div>
+		{% endfor%}
+		{% if username %}
+		<div align="center top-1">
+			<a class="btn btn-success add_country_btn">+Add More</a>
+		</div>
+		{% endif %}
+	</div>
+	<div class="col-md-1">
+	</div>
+	<div class="col-md-4">
+		<div class="row text-center" id="club_row">
+			<div class="row">
+				{% if not country_name%}
+				<h2 id="club_list_title">Please Select Country First</h2>
+				{% else %}
+				<h2 id="club_list_title">{{country_name}} Clubs</h2>
+				{% endif %}
+			</div>
+			{%for club in country_club_list %}
+			<div class="row text-center top-1">
+
+				<a class="btn btn-default disabled">{{club.name | safe}}</a>
+
+				{% if club.editable == True %}
+				<a data-id= {{club.id}} data-name="{{club.name}}" data-country={{club.country_id}} class="btn btn-warning edit_club_btn" style = "width : 50px;">Edit</a>
+				{% endif %}
+			</div>
+			{% endfor %}
+			{% if username %}
+			<div id="add_club_sub" class="row text-center top-1">
+				<div align="center">
+					<a class="btn btn-success addClubBtn" data-id= {{country_id}}>+Add More</a>
+				</div>
+			</div>
+			{% endif %}
+
+		</div>
+	</div>
+
+</div>
+
+{% endblock %}

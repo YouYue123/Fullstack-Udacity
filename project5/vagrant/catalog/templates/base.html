@@ -9,17 +9,18 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 		<script   src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" href="/css/main.css">
 		<title>Football Club Catalog</title>
 	</head>
 	
 	<body>
 
 		<nav class="navbar navbar-default navbar-static-top">
-  			<div class="container" style="width:80%;">
+  			<div class="container">
       				<h3 class="navbar-text">Football Club Catalog</h3>
       				 {%if not username%}
       				 <div id="signBtnDiv">
-	      				 <div style="margin-top:1%; float:right;">
+	      				 <div class="login_group">
 	          				<span class="g-signin"
 	            				data-scope="openid email"
 	           	 				data-clientid="1034298223889-mpqu8acokll8j9foa79qnh1jmbidum2e.apps.googleusercontent.com"
@@ -33,8 +34,8 @@
         			</div>
         			{%else%}
         			
-        				<button class='btn btn-danger' onclick='signOutCallback()' style="margin-top:1%;float:right;">Logout</button>
-        				<p style="float:right; margin-top:1.5%;margin-right:1%;">welcome {{username | safe}}</p>
+        			<button class='btn btn-danger' onclick='signOutCallback()'>Logout</button>
+        			<p>welcome {{username | safe}}</p>
         	
         			{%endif%}
   			</div>
@@ -60,6 +61,7 @@
                      	    <input type="textarea" id="name" class="form-control" name="name">
       					</div>
       					<div class="modal-footer">
+
         					<a type="button" class="btn btn-default" data-dismiss="modal">Close</a>
         					<button id="save_btn" type="submit" class="btn btn-success">Save</button>
         					<a id="delete_btn" class="btn btn-danger">Delete</a>
@@ -68,92 +70,9 @@
 		    	</div>
 	  		</div>
 		</div>
-		
-		<div id="club_add_btn" hidden>
-			<div align="center">
-				<a id="addClub" class="btn btn-success">+Add More</a>
-			</div>
-		</div>
 	
 	</body>
 
-	<script>
-		function signInCallback(googleUser) {
-  			$.ajax({
-  				type:'POST',
-  				url:'/gconnect?state={{state}}',
-  				processData: false,
-  				contentType: 'application/octet-stream;charset=utf-8',
-  				data: googleUser.code,
-  				success: function(result){
-  					if(result){
-  						window.location.href = "/"; 
-  					}
-  				},
-  				error :  function(result){
+	<script src="/js/main.js"></script>
 
-  				}
-  			});
-		}
-
-		function signOutCallback(){
-			$.ajax({
-				type:'POST',
-				url:'/gdisconnect',
-				processData:false,
-				content: 'application/octet-stream;charset=utf-8',
-				success: function(result){
-					window.location.href = "/"; 				
-				}
-			});
-		}
-
-		$(document).on("click", ".add_country_btn", function () {
-     			$('#modal_main_title').text('Add a new country')
-     			$('#modal_body_title').text('Country');
-     			$("#present_form").attr("action", "/country/new");
-     			$("#delete_btn").hide()
-     		    $('#present_modal').modal('show');
-		});
-
-		$(document).on("click", ".edit_country_btn", function () {
-     			var country_id = $(this).data('id');
-     			var country_name = $(this).data('name');
-     			$('#modal_main_title').text('Edit Country Information')
-     			$('#modal_body_title').text('Country');
-     			$("#name").val( country_name );
-     			$("#present_form").attr("action", "/country/"+ country_id +"/edit");
-     			$("#delete_btn").attr("onclick","deleteCountry(" + country_id  +")")
-     		    $('#present_modal').modal('show');
-		});
-
-
-		function deleteCountry(country_id){
-			
-			$.ajax({
-				type: 'POST',
-				url: '/country/' + country_id + '/delete',
-				content:'application/octet-stream;charset=utf-8',
-				success: function(result){
-					window.location.href="/";
-				}
-			});
-		
-		}
-
-		$(document).on("click",".show_club_btn",function(){
-				var country_id = $(this).data('id');
-				var country_name = $(this).data('name');
-				$.ajax({
-					type:'GET',
-					url:'/country/'+  country_id +'/football_club/JSON',
-					content:'application/octet-stream;charset=utf-8',
-					success: function(result){
-						
-						$('#club_list_title').text(country_name + " Club List");
-						$('#add_club_sub').html($('#club_add_btn').html())
-					}
-				});
-		});
-	</script>
 </html>
