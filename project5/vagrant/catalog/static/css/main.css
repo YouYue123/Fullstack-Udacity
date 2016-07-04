@@ -1,0 +1,30 @@
+.login_group{
+	margin-top:1%; 
+	float:right;
+}
+
+.navbar  .container{
+	width:80%;
+}
+
+.navbar .container .btn-danger{
+	margin-top:1%;
+	float:right;
+}
+
+.navbar .container p {
+	float:right; 
+	margin-top:1.5%;
+	margin-right:1%;
+}
+
+.top-1{
+	margin-top: 1%;
+}
+
+.country-list{
+	border-right:2px solid; 
+	border-color:black;
+}
+
+
