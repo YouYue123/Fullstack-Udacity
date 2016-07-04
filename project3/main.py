@@ -109,7 +109,7 @@ class NewPost(BlogHandler):
 
         subject = self.request.get('subject')
         content = self.request.get('content')
-        user_id = int(self.read_secure_cookie('user_id'))
+        user_id = self.user.key().id()
 
         if subject and content:
             p = Post.create(subject,content,user_id)
