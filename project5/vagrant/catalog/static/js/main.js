@@ -1,32 +1,6 @@
-function signInCallback(googleUser) {
-  			$.ajax({
-  				type:'POST',
-  				url:'/gconnect?state={{state}}',
-  				processData: false,
-  				contentType: 'application/octet-stream;charset=utf-8',
-  				data: googleUser.code,
-  				success: function(result){
-  					if(result){
-  						window.location.href = "/"; 
-  					}
-  				},
-  				error :  function(result){
 
-  				}
-  			});
-		}
 
-function signOutCallback(){
-	$.ajax({
-		type:'POST',
-		url:'/gdisconnect',
-		processData:false,
-		content: 'application/octet-stream;charset=utf-8',
-		success: function(result){
-			window.location.href = "/"; 				
-		}
-	});
-}
+
 
 $(document).on("click", ".add_country_btn", function () {
 			$('#modal_main_title').text('Add a new country')

@@ -63,7 +63,6 @@ def gconnect():
     if request.args.get('state') != login_session['state']:
 
         return make_json_response('Invalid state parameter',401)
-    
     # Obtain authorization code
     code = request.data
     try:
@@ -113,9 +112,8 @@ def gconnect():
     login_session['gplus_id'] = gplus_id
     login_session['username'] = data["name"]
     login_session['picture'] = data["picture"]
-    login_session['email'] = data["email"] 
+    login_session['email'] = data["email"]
     result = {'picture': login_session['picture'], 'username' : login_session['username']}
-    flash("You are logged in ")
     return make_json_response(result,200)
 
 #google-plus logout
@@ -126,6 +124,7 @@ def gdisconnect():
         return make_json_response("Current user is not connected",401)
 
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+
     h = httplib2.Http()
     result = h.request(url,'GET')[0]
     if result['status'] == '200':
@@ -173,8 +172,10 @@ def deletecountry(country_id):
     country = session.query(Country).filter_by(id = country_id).first()
     country_club_list = session.query(FootballClub).filter_by(country_id = country.id).all()
     if 'gplus_id' in login_session and login_session['gplus_id'] == country.add_owner:
-        session.delete(country_club_list)
-        session.delete(country)
+        if country_club_list:
+            session.delete(country_club_list)
+        if country:
+            session.delete(country)
     session.commit()
     return make_json_response('Success',200)
 

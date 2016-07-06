@@ -33,10 +33,8 @@
 	        			</div>
         			</div>
         			{%else%}
-        			
         			<button class='btn btn-danger' onclick='signOutCallback()'>Logout</button>
         			<p>welcome {{username | safe}}</p>
-        	
         			{%endif%}
   			</div>
 		</nav>
@@ -74,5 +72,35 @@
 	</body>
 
 	<script src="/js/main.js"></script>
-
+	<script >
+		function signInCallback(googleUser) {
+  			$.ajax({
+  				type:'POST',
+  				url:'/gconnect?state={{state}}',
+  				processData: false,
+  				contentType: 'application/octet-stream;charset=utf-8',
+  				data: googleUser.code,
+  				success: function(result){
+  					if(result){
+  						window.location.href = "/"; 
+  					}
+  				}
+  			});
+		}
+		function signOutCallback(){
+			$.ajax({
+				type:'POST',
+				url:'/gdisconnect',
+				processData:false,
+				content: 'application/octet-stream;charset=utf-8',
+				success: function(result){
+					console.log(result)
+					window.location.href = "/"; 				
+				},
+				error: function(result){
+					console.log(result)
+				}
+			});
+	    }
+	</script>
 </html>

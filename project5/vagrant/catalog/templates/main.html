@@ -16,7 +16,9 @@
 		{% endfor%}
 		{% if username %}
 		<div align="center top-1">
-			<a class="btn btn-success add_country_btn">+Add More</a>
+			<div align="center">
+				<a class="btn btn-success add_country_btn">+Add More</a>
+			</div>
 		</div>
 		{% endif %}
 	</div>
@@ -41,7 +43,7 @@
 				{% endif %}
 			</div>
 			{% endfor %}
-			{% if username %}
+			{% if username and country_name %}
 			<div id="add_club_sub" class="row text-center top-1">
 				<div align="center">
 					<a class="btn btn-success addClubBtn" data-id= {{country_id}}>+Add More</a>
