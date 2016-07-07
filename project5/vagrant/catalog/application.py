@@ -154,8 +154,11 @@ def countryJSON():
 @app.route('/country/new',methods=['POST'])
 def newCountry():
         country = Country(name=request.form.get('name'),add_owner=login_session['gplus_id'])
-        session.add(country)
-        session.commit()
+
+        if 'gplus_id' in login_session:
+            session.add(country)
+            session.commit()
+        
         return redirect('/')
 #Edit the country
 @app.route('/country/<int:country_id>/edit',methods=['POST'])
@@ -173,7 +176,8 @@ def deletecountry(country_id):
     country_club_list = session.query(FootballClub).filter_by(country_id = country.id).all()
     if 'gplus_id' in login_session and login_session['gplus_id'] == country.add_owner:
         if country_club_list:
-            session.delete(country_club_list)
+            for club in country_club_list:
+                session.delete(club)
         if country:
             session.delete(country)
     session.commit()
