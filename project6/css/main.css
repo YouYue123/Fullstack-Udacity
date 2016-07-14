@@ -1,5 +1,39 @@
-@media only screen and (max-width : 1000px){
+
+html, body { height: 100%; margin: 0; padding: 0; }
+
+#map { height: 100%; }
+
+@media screen and (max-width : 1000px){
 	.col-md-3{
-		display: none;
+	  position : absolute;
+	  height : 70%;
+	  width : 50%;
+	  top: 11%;
+	  left: -1000px;
+	  z-index: 100;
+	}
+	#panel-btn {
+	  float:left;
+	  display: block;
+	}
+	 #content-container{
+	  padding-top:20%;
+	  height:100%;
+	}
+}
+
+@media screen and (min-width : 1001px){
+	#panel-btn{
+	  float:left; 
+	  display:none;
+	}
+	.col-md-3{
+	  padding-left:20px;
+	  position : block;
+	  top: 6%;
+	}
+	#content-container{
+	  padding-top:6%;
+	  height:100%;
 	}
 }

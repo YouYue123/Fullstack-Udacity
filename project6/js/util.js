@@ -9,12 +9,6 @@ function scrollToRestaurant(restaurant){//scroll when click specific marker
 
 }
 
-function filterByFilterText(){//filter restaurant list and trigger filter markers
-    var keyword = $('#filterText').val();
-    appViewModel.filterRestaurant(keyword);
-    refreshMapByFilter()
-}
-
 
 function refreshMapByFilter(){//filter markers
 
@@ -35,9 +29,10 @@ function clearMarkers(){//clear existing markers
     }
 }
 
-function toggleRestaurant(id){//simulate click on marker 
+function toggleRestaurant(restaurant){//simulate click on marker 
 
-  new google.maps.event.trigger(markerList[id],'click');
+    //console.log(restaurant)
+  new google.maps.event.trigger(markerList[restaurant.id()],'click');
 
 }
 

@@ -2,8 +2,10 @@
 
 ### Setup
 
-1.Navigate to folder project6
-2.run index.html in your browser
+1.Download or fork the application from: https://github.com/YouYue123/Fullstack-Udacity/tree/master/project6
+2.Select index.html to start the app
+3.Use filter box to filter list items and map markers
+4.Select a list item or map marker to open an info window describing the marker.
     
 ### Feature
 ```

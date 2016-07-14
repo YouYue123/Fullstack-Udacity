@@ -47,7 +47,7 @@ function initWithFactualObject(factualObject,index){//factual object middleware
         restaurant.longitude = factualObject.longitude;
         restaurant.name = factualObject.name;
         restaurant.cusine = factualObject.cuisine;
-        restaurant.address = factualObject.address + " " + factualObject.address_extended
+        restaurant.address = factualObject.address
         restaurant.tel = factualObject.tel;
         restaurant.website = factualObject.website;
         restaurant.id(index);
@@ -120,4 +120,7 @@ function setRestaurantMarkerOnMap(restaurant){//set marker middleware
         });
         marker.setMap(map);
         markerList.push(marker);
+}
+function googleMapErrorHandle(){
+  alert("Google Map Loading Error");
 }

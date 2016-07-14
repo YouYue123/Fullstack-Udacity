@@ -5,45 +5,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Durham Restaurant Map</title>
-    <script src="bower_components/jquery/dist/jquery.min.js"></script>
-    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="bower_components/jquery.scrollTo/jquery.scrollTo.min.js"></script>
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
-    <style type="text/css">
-      html, body { height: 100%; margin: 0; padding: 0; }
-      #map { height: 100%; }
-      @media screen and (max-width : 1000px){
-        .col-md-3{
-          position : absolute;
-          height : 70%;
-          width : 50%;
-          top: 11%;
-          left: -1000px;
-          z-index: 100;
-        }
-        #panel-btn {
-          float:left;
-          display: block;
-        }
-         #content-container{
-          padding-top:20%;
-          height:100%;
-        }
-      }
-      @media screen and (min-width : 1001px){
-        #panel-btn{
-          float:left; 
-          display:none;
-        }
-        .col-md-3{
-          padding-left:20px;
-        }
-        #content-container{
-          padding-top:6%;
-          height:100%;
-        }
-      }
-	 </style>
+    <link rel="stylesheet" href="css/main.css">
   </head>
 
   <body>
@@ -70,19 +33,20 @@
     		<div class="col-md-3">
     			
           <div class="row">
-    				<div class="input-group">
-      					<input type="text" class="form-control" placeholder="Search for..." id="filterText">
-     					<span class="input-group-btn">
+    				<div class="input-group" style="width:100%;">
+      					<input type="text" class="form-control" placeholder="Search for..." id="filterText" data-bind="textInput: currentFilter" >
+     					<!-- <span class="input-group-btn">
         					<button class="btn btn-default" type="button" onclick="filterByFilterText()">Go!</button>
-     					</span>
+     					</span> -->
     				</div>
     			</div>
 
     			<div class="row">
     				<ul class="list-group" id="restaurant-list" data-bind="foreach:filteredRestaurantList" style="height:500px;overflow:hidden;overflow-y:scroll;">
   						<li class="list-group-item list-group-item-success" data-bind="attr:{id: $data.id()}"> 
+              <!-- <div data-bind="slideVisible: #da, slideDuration:600">You have selected the option</div> -->
                 <a 
-                   data-bind=" text:$data.name,style:{color : $data.isSelected() == true ?  'red' : 'blue'} , attr : {href : $data.toggleRestaurantUrl()}">    
+                   data-bind=" text:$data.name,style:{color : $data.isSelected() == true ?  'red' : 'blue'} , click : toggleRestaurant">    
                 </a>
               </li>
 					  </ul>
@@ -97,11 +61,14 @@
     	
     	</div>
     </main>
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="bower_components/jquery.scrollTo/jquery.scrollTo.min.js"></script>
     <script src="bower_components/knockout/dist/knockout.debug.js"></script>
   	<script src="js/restaurant.js"></script>
     <script src="js/view_model.js"></script>
     <script src="js/api.js"></script>
     <script src="js/util.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_F-9yGzcVHECtc686iJOA3gatgas7BGw&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_F-9yGzcVHECtc686iJOA3gatgas7BGw&callback=initMap" onerror="googleMapErrorHandle()" async defer></script>
   </body>
 </html>
