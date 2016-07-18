@@ -13,8 +13,9 @@ var Restaurant = function(){
   			self.address = "107 E Parrish St";
   			self.tel = "(919) 680-2333";
   			self.website = "http://www.bullcityburgerandbrewery.com";
-  			self.isSelected = ko.observable(false)
+  			self.isSelected = ko.observable(false);
+        self.marker = null;
         self.toggleRestaurantUrl = ko.pureComputed(function(){
-          return 'javascript:toggleRestaurant(' + self.id() + ')'
-        })
+          return 'javascript:toggleRestaurant(' + self.id() + ')';
+        });
 }

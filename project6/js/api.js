@@ -6,10 +6,12 @@ var factualAPIKey = "Z2R3lQruh3KuQQBp9iCtWNhfPFHfiZyQ1nRCO8wh";
 var query = "Restaurant,'Durham'";
 var factualRestaurantEndPoint = "http://api.v3.factual.com/t/restaurants-us?";
 var map;
-var getRestaurantListApiEndPoint = "http://api.v3.factual.com/t/restaurants-us?filters={\"category_labels\":{\"$includes\":\"restaurant\"},\"locality\":\"Durham\"}&KEY=Z2R3lQruh3KuQQBp9iCtWNhfPFHfiZyQ1nRCO8wh&limit=50"
+var getRestaurantListApiEndPoint = "http://api.v3.factual.com/t/restaurants-us?filters={\"category_labels\":{\"$includes\":\"restaurant\"},\"locality\":\"Durham\"}&KEY=Z2R3lQruh3KuQQBp9iCtWNhfPFHfiZyQ1nRCO8wh&limit=50";
 var preInfoWindow = null;
 var preRestaurant = null;
 var markerList = []; 
+var appViewModel = new AppViewModel();
+ko.applyBindings(appViewModel);
 
 function initMap() {//google map api callback
 
@@ -47,7 +49,7 @@ function initWithFactualObject(factualObject,index){//factual object middleware
         restaurant.longitude = factualObject.longitude;
         restaurant.name = factualObject.name;
         restaurant.cusine = factualObject.cuisine;
-        restaurant.address = factualObject.address
+        restaurant.address = factualObject.address;
         restaurant.tel = factualObject.tel;
         restaurant.website = factualObject.website;
         restaurant.id(index);
@@ -91,36 +93,70 @@ function setRestaurantMarkerOnMap(restaurant){//set marker middleware
             restaurant.isSelected(false);
           });
 
-          var marker = this
+          var marker = this;
           marker.setAnimation(google.maps.Animation.BOUNCE);
           setTimeout(function(){ marker.setAnimation(null); }, 1500);
 
           if (preInfoWindow == infowindow){//click the opened window marker
              
-             infowindow.close()
+             infowindow.close();
              restaurant.isSelected(false);
              preInfoWindow = null;
           }
           else{//click another marker
              
              if(preInfoWindow !== null){
-                preInfoWindow.close()
+                preInfoWindow.close();
                 preRestaurant.isSelected(false);
              }
 
              infowindow.open(map, marker);
              restaurant.isSelected(true);
              
-             scrollToRestaurant(restaurant)
+             scrollToRestaurant(restaurant);
 
              preInfoWindow = infowindow;
              preRestaurant = restaurant;
           }
 
         });
+        restaurant.marker = marker;
         marker.setMap(map);
         markerList.push(marker);
 }
+
+// function filterMap(restaurantList){
+
+//     for(i in markerList){
+//        markerList[i].setVisible(false);
+//     }
+
+//     for(i in restaurantList){
+//         restaurantList[i].marker.setVisible(true);
+//     }       
+// }
+
+function refreshMapByFilter(){//filter markers
+    //console.log("fuck")
+    clearMarkers();
+    preInfoWindow = null;
+    preRestaurant = null;
+    markerList = [];
+    for(var i=0; i < appViewModel.filteredRestaurantList().length;i++){
+      appViewModel.filteredRestaurantList()[i].id(i);
+        setRestaurantMarkerOnMap(appViewModel.filteredRestaurantList()[i]);
+    }
+}
+
+function clearMarkers(){//clear existing markers
+
+    for(var i=0 ; i< markerList.length ; i++){
+      markerList[i].setMap(null);
+    }
+}
+
 function googleMapErrorHandle(){
+
   alert("Google Map Loading Error");
+
 }

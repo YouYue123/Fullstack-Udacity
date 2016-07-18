@@ -44,7 +44,6 @@
     			<div class="row">
     				<ul class="list-group" id="restaurant-list" data-bind="foreach:filteredRestaurantList" style="height:500px;overflow:hidden;overflow-y:scroll;">
   						<li class="list-group-item list-group-item-success" data-bind="attr:{id: $data.id()}"> 
-              <!-- <div data-bind="slideVisible: #da, slideDuration:600">You have selected the option</div> -->
                 <a 
                    data-bind=" text:$data.name,style:{color : $data.isSelected() == true ?  'red' : 'blue'} , click : toggleRestaurant">    
                 </a>
