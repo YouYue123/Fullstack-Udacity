@@ -67,10 +67,11 @@ class Game(ndb.Model):
 
 
 class History(ndb.Model):
+    winningStatus = ndb.StringProperty(required=True)
     hitStatus = ndb.BooleanProperty(required=True)
     guesses = ndb.StringProperty(required=True)
     def to_form(self):
-        return HistoryForm(guess=self.guesses,hitStatus=self.hitStatus)
+        return HistoryForm(guess=self.guesses,hitStatus=self.hitStatus,winningStatus=self.winningStatus)
 
 class GameHistory(ndb.Model):
     game = ndb.KeyProperty(required=True,kind='Game')
@@ -80,8 +81,8 @@ class GameHistory(ndb.Model):
         new_game_history = GameHistory(game=game,histories=[])
         new_game_history.put()
 
-    def addHistory(self,hitStatus,guesses):
-        history = History(hitStatus = hitStatus,guesses = guesses)
+    def addHistory(self,hitStatus,guesses,winningStatus):
+        history = History(hitStatus = hitStatus,guesses = guesses,winningStatus=winningStatus)
         self.histories.append(history)
         self.put()
 
@@ -115,6 +116,7 @@ class UserRankInfo():
 class HistoryForm(messages.Message):
     guess = messages.StringField(1,required=True)
     hitStatus = messages.BooleanField(2,required=True)
+    winningStatus = messages.StringField(3,required=True)
 
 class HistoryForms(messages.Message):
     items = messages.MessageField(HistoryForm,1,repeated=True)

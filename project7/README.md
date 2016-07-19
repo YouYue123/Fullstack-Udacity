@@ -3,22 +3,25 @@
 ## Set-Up Instructions:
 1.  Update the value of application in app.yaml to the app ID you have registered
  in the App Engine admin console and would like to use to host your instance of this sample.
-1.  Run the app with the devserver using dev_appserver.py DIR, and ensure it's
+2.  Run the app with the devserver using dev_appserver.py DIR, and ensure it's
  running by visiting the API Explorer - by default localhost:8080/_ah/api/explorer.
-1.  (Optional) Generate your client library(ies) with the endpoints tool.
+3.  (Optional) Generate your client library(ies) with the endpoints tool.
  Deploy your application.
  
  
- 
-##Game Description:
-Guess a number is a simple guessing game. Each game begins with a random 'target'
-number between the minimum and maximum values provided, and a maximum number of
-'attempts'. 'Guesses' are sent to the `make_move` endpoint which will reply
-with either: 'too low', 'too high', 'you win', or 'game over' (if the maximum
-number of attempts is reached).
-Many different Guess a Number games can be played by many different Users at any
-given time. Each game can be retrieved or played by using the path parameter
-`urlsafe_game_key`.
+## Game Description(Hangman Game):
+Hangman is a paper and pencil guessing game for two or more players. One player thinks of a word, phrase or sentence and the other tries to guess it by suggesting letters or numbers, within a certain number of guesses.
+
+The word to guess is represented by a row of dashes, representing each letter of the word. In most variants, proper nouns, such as names, places, and brands, are not allowed. If the guessing player suggests a letter which occurs in the word, the other player writes it in all its correct positions. If the suggested letter or number does not occur in the word, the other player draws one element of a hanged man stick figure as a tally mark.
+
+## Score rules
+
+Score is based on 2 factors.
+
+1. winning status
+
+2. gusses attempt time
+
 
 ##Files Included:
  - api.py: Contains endpoints and game playing logic.

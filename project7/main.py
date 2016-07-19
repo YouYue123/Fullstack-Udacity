@@ -6,7 +6,7 @@ import logging
 
 import webapp2
 from google.appengine.api import mail, app_identity
-from api import GuessANumberApi
+from api import HangmanApi
 
 from models import User,Game
 
@@ -19,10 +19,10 @@ class SendReminderEmail(webapp2.RequestHandler):
         users = User.query(User.email != None)
         for user in users:
             """only send email to those who have incompleted game"""
-            game = Game.query(Game.user == user.key).get()
-            if game.game_over is False:
+            games = Game.query(Game.user == user.key).filter(Game.game_over == False)
+            if games:
                 subject = 'This is a reminder!'
-                body = 'Hello {}, try out Guess A Number!'.format(user.name)
+                body = 'Hello {}, try out playing hangman!'.format(user.name)
                 # This will send test emails, the arguments to send_mail are:
                 # from, to, subject, body
                 mail.send_mail('noreply@{}.appspotmail.com'.format(app_id),
@@ -34,7 +34,7 @@ class SendReminderEmail(webapp2.RequestHandler):
 class UpdateAverageMovesRemaining(webapp2.RequestHandler):
     def post(self):
         """Update game listing announcement in memcache."""
-        GuessANumberApi._cache_average_attempts()
+        HangmanApi._cache_average_attempts()
         self.response.set_status(204)
 
 

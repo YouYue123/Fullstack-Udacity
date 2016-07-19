@@ -12,8 +12,17 @@ from google.appengine.api import memcache
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from models import User, Game, Score
-from models import StringMessage, NewGameForm, GameForm, MakeMoveForm,\
-    ScoreForms,GameForms,UserRankForms,UserRankInfo,GameHistory,History,HistoryForms
+from models import (StringMessage, 
+                    NewGameForm, 
+                    GameForm, 
+                    MakeMoveForm,
+                    ScoreForms,
+                    GameForms,
+                    UserRankForms,
+                    UserRankInfo,
+                    GameHistory,
+                    History,
+                    HistoryForms)
 from utils import get_by_urlsafe
 
 NEW_GAME_REQUEST = endpoints.ResourceContainer(NewGameForm)
@@ -28,8 +37,8 @@ HIGH_SCORE_REQUEST = endpoints.ResourceContainer(limitation=messages.IntegerFiel
 MEMCACHE_MOVES_REMAINING = 'MOVES_REMAINING'
 
 @endpoints.api(name='hangman', version='v1')
-class GuessANumberApi(remote.Service):
-    """Game API"""
+class HangmanApi(remote.Service):
+    """Hangman Game API"""
     @endpoints.method(request_message=USER_REQUEST,
                       response_message=StringMessage,
                       path='user',
@@ -66,15 +75,19 @@ class GuessANumberApi(remote.Service):
         # This operation is not needed to complete the creation of a new game
         # so it is performed out of sequence.
         taskqueue.add(url='/tasks/cache_average_attempts')
-        return game.to_form('Good luck playing Guess a Number!')
+        return game.to_form('Good luck playing Hangman!')
     @endpoints.method(request_message = GET_GAME_REQUEST,
                       response_message = GameForm,
                       path='cancel_game/{urlsafe_game_key}',
                       name='cancel_game',
-                      http_method='POST')
+                      http_method='PUT')
     def cancel_game(self,request):
       """Cancel a game"""
-      game = get_by_urlsafe(request.urlsafe_game_key,Game)
+      game = get_by_urlsafe(request.urlsafe_game_key, Game)
+      print(game)
+      if game.game_over:
+        return game.to_form('Game already over!')
+
       if game:
         game.cancel_game()
         return game.to_form('Cancel game successfully')
@@ -104,7 +117,7 @@ class GuessANumberApi(remote.Service):
         if not user:
             raise endpoints.NotFoundException(
                     'A User with that name does not exist!')
-        games = Game.query(Game.user == user.key and Game.game_over == False)
+        games = Game.query(Game.user == user.key).filter(Game.game_over == False)
         return GameForms(items=[game.to_form('') for game in games])
 
 
@@ -118,8 +131,6 @@ class GuessANumberApi(remote.Service):
         game = get_by_urlsafe(request.urlsafe_game_key, Game)
         if game.game_over:
             return game.to_form('Game already over!')
-
-        game.attempts_remaining -= 1
         
         """Hangman Game Logic"""
         
@@ -127,46 +138,54 @@ class GuessANumberApi(remote.Service):
         target = list(game.target)
         miss = list(game.miss)
         current = list(game.current)
-        valid = False;
-        
+        valid = False
+        inMissList = False
+        message = ''
         game_history = GameHistory.query(GameHistory.game == game.key).get()
 
         """Check whether the input word is in miss list"""
         for index,t in enumerate(miss):
             if t == word:
-              game_history.addHistory(False,word)
-              return game.to_form('Not hit')
+                inMissList = True
+                game.attempts_remaining -= 1
+                message = 'You already guessed that letter and it is not right! Try again, but a new one this time.'
+                break
         
 
         """Check whether the input word is in target list"""
         for index,t in enumerate(target):
             if word == t:
-              valid = True
-              current[index] = word
+                valid = True
+                message = 'Correct!'
+                current[index] = word
+                break
 
-        game_history.addHistory(valid,word)
         game.current = ''.join(current)
 
         """Update miss list"""
-        if valid == False:
+        if valid == False and inMissList == False:
+            game.attempts_remaining -= 1
             miss.append(word)
             game.miss =''.join(miss)
             game.put()
-            game_history.addHistory(False,word)
-            return game.to_form('Not hit')
+            message = 'Nice try! But it is not a valid word'
 
         """Compare between current and target"""
-        if target == current:
-          game.end_game(True)
-          return game.to_form('You win!')
 
         if game.attempts_remaining < 1:
+            game_history.addHistory(valid,word,'lose')
             game.end_game(False)
-            return game.to_form('Game over!')
+            message = 'Game over!'
         else:
+            if target == current:
+                game.end_game(True)
+                game_history.addHistory(valid,word,'win')
+                message = 'You Win!'
+            else:
+                game_history.addHistory(valid,word,'pending') 
             game.put()
-            return game.to_form('You hit!')
 
+        return game.to_form(message)
     @endpoints.method(response_message=ScoreForms,
                       path='scores',
                       name='get_scores',
@@ -219,7 +238,7 @@ class GuessANumberApi(remote.Service):
                                             winRate,
                                             totalGuesses)
                 userRankInfoList.append(userRankInfo)
-           
+        userRankInfoList = sorted(userRankInfoList, key=lambda user: user.winRate, reverse=True) 
         return UserRankForms(items=[userRank.to_form() for userRank in userRankInfoList])
 
 
@@ -272,4 +291,4 @@ class GuessANumberApi(remote.Service):
                          'The average moves remaining is {:.2f}'.format(average))
 
 
-api = endpoints.api_server([GuessANumberApi])
+api = endpoints.api_server([HangmanApi])

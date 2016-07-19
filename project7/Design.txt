@@ -16,7 +16,7 @@ I added UserRankInfo because I need to present and manage user rank data for ran
 
 Trade-off and struggles
 
-1. When shall I create a new model to manage the data
+1. I need to trade-off under what situation I need a new model to solve the problem
 2. CPU usage or disk usage. This is related when the data requested can be calculated based on the existing data but time consuming. For example, the history step data. I choose to store it to database to avoid unmaintanable code logic and faster concurrency performance.
 
    
