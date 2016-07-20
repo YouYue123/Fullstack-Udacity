@@ -16,11 +16,12 @@ The word to guess is represented by a row of dashes, representing each letter of
 
 ## Score rules
 
-Score is based on 2 factors.
+Score consists of two part. The first one is whether the user win the game or not. The second one is how many times has the user tried to solve the problem.
 
-1. winning status
+Game ranking is also based on score of game. First winning games will get higher rank. Within the scope of same winning games, less tried times will get a higher rank.
 
-2. gusses attempt time
+User ranking is based on 3 factors. First more winning times will get higher rank. Within the scope of same winning times, higher winning rate will get higher rank. With in the scope of both of same winning times and same winning rate, less total tried times will get a higher rank.
+
 
 
 ##Files Included:
@@ -90,7 +91,7 @@ Score is based on 2 factors.
     - Method: GET
     - Parameters: None
     - Returns: Ordered ScoreForms
-    - Description: Return Ordered Score List. Higher Ranking is based on 1st factor(more winning times) and 2nd factor(less guesses number)
+    - Description: Return Ordered Score List. Higher Ranking is based on 1st factor(winning) and 2nd factor(less guesses number)
 
 - **get_user_rankings**
     - Path: 'user_rankings'
@@ -105,7 +106,12 @@ Score is based on 2 factors.
     - Parameter: urlsafe_game_key
     - Return : HistoryForms
     - Description: Return ordered game history based on moving step for a specific game.
-
+- **cancel_game**
+    - Path:'cancel_game/{urlsafe_game_key}'
+    - Method : POST
+    - Parameter:urlsafe_game_key
+    - Return : GameForm
+    - Description : Used to cancel a active game and return the game information
 ##Models Included:
  - **User**
     - Stores unique user_name and (optional) email address.

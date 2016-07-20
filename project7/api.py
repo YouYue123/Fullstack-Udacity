@@ -80,7 +80,7 @@ class HangmanApi(remote.Service):
                       response_message = GameForm,
                       path='cancel_game/{urlsafe_game_key}',
                       name='cancel_game',
-                      http_method='PUT')
+                      http_method='POST')
     def cancel_game(self,request):
       """Cancel a game"""
       game = get_by_urlsafe(request.urlsafe_game_key, Game)
@@ -238,7 +238,7 @@ class HangmanApi(remote.Service):
                                             winRate,
                                             totalGuesses)
                 userRankInfoList.append(userRankInfo)
-        userRankInfoList = sorted(userRankInfoList, key=lambda user: user.winRate, reverse=True) 
+        userRankInfoList = sorted(userRankInfoList, key=lambda user: (user.winTime,user.winRate,-user.totalGuesses),reverse=True) 
         return UserRankForms(items=[userRank.to_form() for userRank in userRankInfoList])
 
 
